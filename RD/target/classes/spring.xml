@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context 
+                            http://www.springframework.org/schema/context/spring-context-2.5.xsd" 
+        xmlns:context="http://www.springframework.org/schema/context">
+        
+        <context:property-placeholder location="classpath:data-access.properties"/>
+                
+        <bean id="Controller_sueldo" class="com.mx.rd.controller.Calculo_sueldo">
+            <property name="dataSource" ref="dataSource"></property>
+        </bean>
+                                                                                                                                                            	                     
+	<bean id="dataSource" class="${jdbc.dataSourceMysql}">  
+            <property name="driverClassName" value="${jdbc.driverClassNameMysql}" />  
+            <property name="url" value="${jdbc.urlMysql}" />  
+            <property name="username" value="${jdbc.credencial1Mysql}" />  
+            <property name="password" value="${jdbc.credencial2Mysql}" />  
+        </bean>  
+
+</beans>
