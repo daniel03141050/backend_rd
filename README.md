@@ -20,10 +20,17 @@ Utilerías: Compuesto por una clase con métodos usados a lo largo del proyecto<
 
 <br/>
 <h2>Implementación y pruebas</h2>
+
+<p>->Es necesario contar con el servidor de base de datos (MySQL)MariaDB 10.4.13 </p>
+<p>->Se deja en raiz el war para despliegue llamado rd.war</p>
+<p>->Se uso como servidor de aplicaciones: GlassFish Server 4.1.1</p>
+<p>->Como IDE se uso Netbeans 8.2 RC</p>
+<p>->El Servidor de aplicaciones corre en el puerto: 10593, favor de modificarlo si en el local de testing es diferente.</p>
+
 <p>En raíz viene un archivo llamado -index.html-, desde el cual se puede testear mas cómodamente el desarrollo, ya que usa una pequeña interfaz, asi mismo se deja un archivo llamado -llamadas de prueba apirest json.bash- en el cual vienen diferentes pruebas hechas a lo largo del desarrollo y con diferentes fines, se deja por aparte el SP para testeo independiente en el archivo Script_sp.sql, dejo de cualquier manera algunas opciones de testing aquí:</p>
 
 <p>curl -X POST -H "Content-type: application/json" -d "{ \"Jugadores\": [{ \"id_jugador\":\"5\",  \"goles\":\"1\",  \"sueldo_completo\":\"0\"},{ \"id_jugador\":\"6\",  \"goles\":\"11\",  \"sueldo_completo\":\"0\"},{ \"id_jugador\":\"8\",  \"goles\":\"3\",  \"sueldo_completo\":\"15\"},{ \"id_jugador\":\"10\",  \"goles\":\"4\",  \"sueldo_completo\":\"0\"}] }" http://localhost:10593/rd/Calculo_pago_jugadores.do<p>
   
 <p>curl -X POST -H "Content-type: application/json" -d "{ \"Jugadores\": [{ \"id_jugador\":\"5\",  \"goles\":\"3\",  \"sueldo_completo\":\"0\"},{ \"id_jugador\":\"7\",  \"goles\":\"10\",  \"sueldo_completo\":\"15\"},{ \"id_jugador\":\"9\",  \"goles\":\"3\",  \"sueldo_completo\":\"0\"},{ \"id_jugador\":\"10\",  \"goles\":\"5\",  \"sueldo_completo\":\"0\"}] }" http://localhost:10593/rd/Calculo_pago_jugadores.do<p>
   
-  El servidor de aplicaciones corre en el puerto: 10593, favor de modificarlo si en el local de testing es diferente.
+  
