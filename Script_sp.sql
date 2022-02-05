@@ -1,6 +1,12 @@
 
+#Test exitoso
 SET @folio='';
 CALL calculo_equipo_json('[{ "id_jugador":"5",  "goles":"1",  "sueldo_completo":"5"},{ "id_jugador":"6",  "goles":"11",  "sueldo_completo":"500"},{ "id_jugador":"8",  "goles":"3",  "sueldo_completo":"15"}]',@folio);
+SELECT @folio;
+
+#Test con error,, un jugador no existe en BD, se devuelve NULL
+SET @folio='';
+CALL calculo_equipo_json('[{ "id_jugador":"5",  "goles":"1",  "sueldo_completo":"5"},{ "id_jugador":"6",  "goles":"11",  "sueldo_completo":"500"},{ "id_jugador":"1",  "goles":"3",  "sueldo_completo":"15"}]',@folio);
 SELECT @folio;
 
 
@@ -40,7 +46,8 @@ BEGIN
     
     IF vJsonEsValido = 0 THEN 
         # El objeto JSON no es válido, salimos prematuramente
-        SELECT "JSON suministrado no es válido";
+        #--SELECT "JSON suministrado no es válido";
+		SELECT '[]' INTO pParametroJsonOut;
     ELSE 
 	
         # Nuestro objeto es válido, podemos proceder
@@ -54,6 +61,7 @@ BEGIN
                 SET vCampo1 = JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].id_jugador')));
                 SET vCampo2 = JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].goles')));
                 SET vCampo3 = JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].sueldo_completo'));
+				SET fnombre=null;
 				
 				SELECT 	j.nombre,den.goles_mensuales,j.sueldo,j.bono,if( ( vCampo2 /den.goles_mensuales)*(j.bono/2) <= (j.bono/2) , ( vCampo2 /den.goles_mensuales)*(j.bono/2) , (j.bono/2) ),e.nombre INTO fnombre,fgolesmensuales,fsueldo,fbono,fcalculobonoindividual,fnombreequipo FROM Jugador j INNER JOIN detalle_equipo_nivel den ON den.id_den=j.id_den AND id_jugador=vCampo1 INNER JOIN equipo e ON den.id_equipo=e.id_equipo;
 				
@@ -64,6 +72,12 @@ BEGIN
 				SELECT JSON_INSERT(pParametroJsonOut, CONCAT('$[', vIndex, ']'),  json_out) INTO pParametroJsonOut;
 				
 				SET vIndex = vIndex + 1;
+				
+				#--Verificación de existencia de jugadores
+				IF fnombre IS NULL THEN
+					SET vIndex = vItems;
+					SET pParametroJsonOut='[]';
+				END IF;
 				
             END WHILE;
             

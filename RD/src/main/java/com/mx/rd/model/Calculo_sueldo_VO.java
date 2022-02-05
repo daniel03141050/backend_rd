@@ -5,123 +5,131 @@
  */
 package com.mx.rd.model;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-
-import com.mx.rd.controller.payload.Jugadores_payload;
-
-import com.mx.rd.controller.payload.Request_calculo_pago;
-import com.mx.rd.utilerias.Utilerias;
-
-import java.lang.reflect.Type;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.sql.DataSource;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 /**
  *
  * @author danie
  */
 public class Calculo_sueldo_VO {
-    private DataSource dataSource;
-    private Request_calculo_pago obj_cp_response;
-    private ArrayList<Calculol_sueldo_BO> jugadorArray;
-    private Utilerias obj_utilerias;
-    public String operacion(Request_calculo_pago obj_cp) 
-    {
-        obj_utilerias=new Utilerias();
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(getDataSource());
-        Gson gson = new Gson();
-        String S=null;
-        try
-        {
-            
-            ArrayList<Jugadores_payload> obj2=obj_cp.getJugadores();
-            String json = new Gson().toJson(obj2);
-            System.out.println(" JSON ----> "+json);
-            
-            Connection connection = jdbcTemplate.getDataSource().getConnection();
-            CallableStatement callableStatement = connection.prepareCall("{CALL calculo_equipo_json(?,?)}");
-            callableStatement.setString(1, json);
-            callableStatement.registerOutParameter(2, Types.VARCHAR);
-            callableStatement.executeUpdate();
-            
-            S = callableStatement.getString(2);
-            
-            System.out.println("------>"+S);
-            
-            Type userListType = new TypeToken<ArrayList<Calculol_sueldo_BO>>(){}.getType();
-            
-            jugadorArray = gson.fromJson(S, userListType);
-            
-            /*
-                obtener el porcentaje de los equipos
-            */
-            Map<String, Long> equipos = jugadorArray.stream().collect(Collectors.groupingBy(Calculol_sueldo_BO::getEquipo, Collectors.counting()));
-            
-            equipos.keySet().forEach((obj_ms) -> {
-                float goles_reales=jugadorArray.stream().filter(obj_utilerias.filtroEquipo(obj_ms)).mapToInt(C -> C.getGoles()).sum();                
-                float goles_minimos=jugadorArray.stream().filter(obj_utilerias.filtroEquipo(obj_ms)).mapToInt(C -> C.getGoles_minimos()).sum();
-                float porcentaje_equipo=goles_reales/goles_minimos;
-                obj_utilerias.añadir_calculo_equipo(jugadorArray,obj_ms,porcentaje_equipo);
-            });
-            
-            for(Calculol_sueldo_BO obj_ms : jugadorArray) {
-                System.out.println("Nombre = "+obj_ms.getNombre()+" Goles minimos "+obj_ms.getGoles_minimos()+" Goles reales "+obj_ms.getGoles()+" Calculo Pago "+obj_ms.getSueldo_completo());
-            }
-            
-        }catch (SQLException e)
-        {
-            System.out.println("Error");
-            System.out.println(e.getMessage());
-        }
-        String json = new Gson().toJson(jugadorArray);
-        JsonElement jsonElement = new JsonParser().parse(json);
-        
-        JsonObject jsono=new JsonObject();        
-        jsono.add("Jugadores", jsonElement);
-        
-        return jsono.toString();
-    }
     
-    
-    
+    private String nombre;
+    private int goles;
+    private int goles_minimos;
+    private String sueldo;
+    private float bono;
+    private float sueldo_completo;
+    private String calculo_individual;
+    private String equipo;
+
     /**
-     * @return the dataSource
+     * @return the nombre
      */
-    public DataSource getDataSource() {
-        return dataSource;
+    public String getNombre() {
+        return nombre;
     }
 
     /**
-     * @param dataSource the dataSource to set
+     * @param nombre the nombre to set
      */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     /**
-     * @return the obj_cp_response
+     * @return the goles
      */
-    public Request_calculo_pago getObj_cp_response() {
-        return obj_cp_response;
+    public int getGoles() {
+        return goles;
     }
 
     /**
-     * @param obj_cp_response the obj_cp_response to set
+     * @param goles the goles to set
      */
-    public void setObj_cp_response(Request_calculo_pago obj_cp_response) {
-        this.obj_cp_response = obj_cp_response;
+    public void setGoles(int goles) {
+        this.goles = goles;
     }
 
+    /**
+     * @return the goles_minimos
+     */
+    public int getGoles_minimos() {
+        return goles_minimos;
+    }
+
+    /**
+     * @param goles_minimos the goles_minimos to set
+     */
+    public void setGoles_minimos(int goles_minimos) {
+        this.goles_minimos = goles_minimos;
+    }
+
+    /**
+     * @return the sueldo
+     */
+    public String getSueldo() {
+        return sueldo;
+    }
+
+    /**
+     * @param sueldo the sueldo to set
+     */
+    public void setSueldo(String sueldo) {
+        this.sueldo = sueldo;
+    }
+
+    /**
+     * @return the bono
+     */
+    public float getBono() {
+        return bono;
+    }
+
+    /**
+     * @param bono the bono to set
+     */
+    public void setBono(float bono) {
+        this.bono = bono;
+    }
+
+    /**
+     * @return the sueldo_completo
+     */
+    public float getSueldo_completo() {
+        return sueldo_completo;
+    }
+
+    /**
+     * @param sueldo_completo the sueldo_completo to set
+     */
+    public void setSueldo_completo(float sueldo_completo) {
+        this.sueldo_completo = sueldo_completo;
+    }
+
+    /**
+     * @return the calculo_individual
+     */
+    public String getCalculo_individual() {
+        return calculo_individual;
+    }
+
+    /**
+     * @param calculo_individual the calculo_individual to set
+     */
+    public void setCalculo_individual(String calculo_individual) {
+        this.calculo_individual = calculo_individual;
+    }
+
+    /**
+     * @return the equipo
+     */
+    public String getEquipo() {
+        return equipo;
+    }
+
+    /**
+     * @param equipo the equipo to set
+     */
+    public void setEquipo(String equipo) {
+        this.equipo = equipo;
+    }
     
 }

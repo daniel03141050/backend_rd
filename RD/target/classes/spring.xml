@@ -9,7 +9,11 @@
         
         <context:property-placeholder location="classpath:data-access.properties"/>
                 
-        <bean id="Controller_sueldo" class="com.mx.rd.model.Calculo_sueldo_VO">
+        <bean id="Calculo_sueldo_BO" class="com.mx.rd.model.Calculo_sueldo_BO">
+            <property name="dataSource" ref="dataSource"></property>
+        </bean>
+        
+        <bean id="Jugadores_BO" class="com.mx.rd.model.Jugadores_BO">
             <property name="dataSource" ref="dataSource"></property>
         </bean>
                                                                                                                                                             	                     

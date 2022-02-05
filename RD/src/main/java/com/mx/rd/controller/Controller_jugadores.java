@@ -5,8 +5,10 @@
  */
 package com.mx.rd.controller;
 
-import com.mx.rd.model.Calculo_sueldo_VO;
-import com.mx.rd.controller.payload.Request_calculo_pago;
+import com.mx.rd.model.Calculo_sueldo_BO;
+import com.mx.rd.model.Jugadores_BO;
+import com.mx.rd.model.Jugadores_VO;
+import java.util.ArrayList;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,15 +23,24 @@ public class Controller_jugadores {
     
     @CrossOrigin(origins = "*")
     @PostMapping("/Calculo_pago_jugadores.do")
-    public String calculo_sueldo(@RequestBody Request_calculo_pago List_jugadores) {
+    public String calculo_sueldo(@RequestBody String List_jugadores) {
         
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
-        Calculo_sueldo_VO obj_cs = (Calculo_sueldo_VO) ctx.getBean("Controller_sueldo");
+        Calculo_sueldo_BO obj_cs = (Calculo_sueldo_BO) ctx.getBean("Calculo_sueldo_BO");
         
         return obj_cs.operacion(List_jugadores);
         
     }
     
+    @CrossOrigin(origins = "*")
+    @PostMapping("/Get_jugadores.do")
+    public  ArrayList<Jugadores_VO> get_jugadores() {
         
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+        Jugadores_BO obj_cs = (Jugadores_BO) ctx.getBean("Jugadores_BO");
+        
+        return obj_cs.Get_jugadores();
+        
+    }
     
 }

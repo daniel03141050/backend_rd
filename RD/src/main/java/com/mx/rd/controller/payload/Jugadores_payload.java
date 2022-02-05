@@ -13,13 +13,13 @@ public class Jugadores_payload {
         
     public Jugadores_payload()
     {
-        id_jugador="";
-        goles=0;
+        id_jugador="ND";
+        goles="ND";
         sueldo_completo=0;
     }
 
     private String id_jugador;
-    private int goles;
+    private String goles;
     private float sueldo_completo;
 
     /**
@@ -39,14 +39,14 @@ public class Jugadores_payload {
     /**
      * @return the goles
      */
-    public int getGoles() {
+    public String getGoles() {
         return goles;
     }
 
     /**
      * @param goles the goles to set
      */
-    public void setGoles(int goles) {
+    public void setGoles(String goles) {
         this.goles = goles;
     }
 
