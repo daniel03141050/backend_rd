@@ -26,6 +26,7 @@ Utilerías: Compuesto por una clase con métodos usados a lo largo del proyecto<
 <p>->Se uso como servidor de aplicaciones: GlassFish Server 4.1.1</p>
 <p>->Como IDE se uso Netbeans 8.2 RC</p>
 <p>->El Servidor de aplicaciones corre en el puerto: 10593, favor de modificarlo si en el local de testing es diferente.</p>
+<p>->Una copia de la BD esta en raiz (resuelve_deuda.sql), se pueden ayudar de esta <a href="https://dev.mysql.com/doc/refman/8.0/en/mysql-batch-commands.html">liga</a> para subir el script por shell, o bien hacer uso de cualquier herramienta de administración de BD para MySQL(MariaDB)</p>
 
 <p>En raíz viene un archivo llamado -index.html-, desde el cual se puede testear mas cómodamente el desarrollo, ya que usa una pequeña interfaz, asi mismo se deja un archivo llamado -llamadas de prueba apirest json.bash- en el cual vienen diferentes pruebas hechas a lo largo del desarrollo y con diferentes fines, se deja por aparte el SP para testeo independiente en el archivo Script_sp.sql, dejo de cualquier manera algunas opciones de testing aquí:</p>
 
