@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+ 
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- Bootstrap CSS -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		
+		<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+		<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+		
+		<link href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet" media="all">
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.1.9/sweetalert2.min.css" integrity="sha512-cyIcYOviYhF0bHIhzXWJQ/7xnaBuIIOecYoPZBgJHQKFPo+TOBA+BY1EnTpmM8yKDU4ZdI3UGccNGCEUdfbBqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.1.9/sweetalert2.all.min.js" integrity="sha512-IZ95TbsPTDl3eT5GwqTJH/14xZ2feLEGJRbII6bRKtE/HC6x3N4cHye7yyikadgAsuiddCY2+6gMntpVHL1gHw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+		<title>Test APIRest RD</title>
+	</head>
+	<body>
+	
+		<h3>Testing para ejercicio de BackEnd :: RD</h3>
+		<p>Selecciona <b>Añadir</b>, para agregar un nuevo jugador y agrega los goles por mes</p>
+		<p>Da Click en <b>Realizar calculo</b> para generar el calculo de pagos mensuales</p>
+		
+		<table>
+			<thead>
+				<tr>
+					<th>Jugador</th>
+					<th>Goles</th>
+					<th>Salario Mensual</th>
+				<tr>
+			</thead>
+			<tbody id="idtbody">
+				
+			</tbody>
+		</table>
+		
+		<input type="button" id="btn-enviar" value="Realizar calculo">
+		<input type="button" id="btn-add" value="Añadir">
+		<input type="button" id="btn-limpiar" value="Limpiar">
+		
+		<table id="tablejugadores" class="display compact" style="width:100%">
+			<thead>
+				<tr>
+					<th>nombre</th>
+					<th>goles_minimos</th>
+					<th>goles</th>                                                                
+					<th>sueldo</th>
+					<th>bono</th>
+					<th>sueldo_completo</th>
+					<th>calculo_individual</th>
+					<th>equipo</th>
+				</tr>
+			</thead>
+		</table>
+		
+	</body>
+	
+	<script>
+		
+		var id_numeracion=0;
+		var tabla=null;
+		var jugadores=[];
+		var jugador =null;
+			
+		document.getElementById("btn-enviar").addEventListener('click', send_to_ws, false);
+		document.getElementById("btn-add").addEventListener('click', show_add, false);
+		document.getElementById("btn-limpiar").addEventListener('click', limpiar, false);
+		var combo="";
+		$.ajax({
+					type: 'POST',
+					url: 'http://localhost:10593/rd/Get_jugadores.do',
+					contentType : "application/json",
+					dataType : "json",
+					success: function(data) {
+					
+							combo="<select id='combojugadores'>";
+							$.each(
+								data,
+								function(index, arrayValores) {
+									combo+="<option value='"+arrayValores.id_jugador+"'>"+arrayValores.nombre+"</option>";
+								}
+							);
+							combo+="</select>";
+							
+					}
+			});
+		
+		function show_add()
+		{
+			Swal.fire({
+			  title: 'Añadir registro',
+			  html:
+				combo +
+				'<input id="swal-input2" placeholder="Goles" class="swal2-input">',
+			  focusConfirm: false,
+			  preConfirm: () => {
+					add(document.getElementById('combojugadores').value,document.getElementById('swal-input2').value)
+			  }
+			})
+		}
+		
+		
+		function limpiar()
+		{
+		
+			if(tabla!==null){
+				tabla.clear().draw();
+			}
+			
+			document.getElementById("idtbody").innerHTML="";
+			id_numeracion=0;
+		}
+		
+		function add(idjugador,goles)
+		{
+			id_numeracion++;
+			document.getElementById("idtbody").innerHTML=document.getElementById("idtbody").innerHTML+"<tr>"+
+														"<td><input type='text' id='j"+id_numeracion+"' value='"+idjugador+"'></td>"+
+														"<td><input type='text' id='g"+id_numeracion+"' value='"+goles+"'></td>"+
+														"<td><input type='text' id='s"+id_numeracion+"' value='0'></td>"+
+													"</tr>";
+		}
+		
+		function assignToEventsColumns(data) {
+			
+			if(tabla!==null){tabla.destroy();tabla.clear().draw();}
+			
+            tabla = $('#tablejugadores').DataTable({
+                "bAutoWidth" : false,
+                "aaData" : data,
+                "columns" : [ {
+                    "data" : "nombre"
+                }, {
+                    "data" : "goles_minimos"
+                }, {
+                    "data" : "goles"
+                }, {
+                    "data" : "sueldo"
+                }, {
+                    "data" : "bono"
+                }, {
+                    "data" : "sueldo_completo"
+                } , {
+                    "data" : "calculo_individual","visible" : false
+                } , {
+                    "data" : "equipo"
+                }  ]
+            })
+		}
+	
+		function send_to_ws()
+		{
+			jugadores=[];			
+			for(i=1; i<=id_numeracion ;i++)
+			{
+				jugador = {
+					id_jugador: parseInt(document.getElementById("j"+i).value),
+					goles:parseInt(document.getElementById("g"+i).value),
+					sueldo_completo:parseInt(document.getElementById("s"+i).value)
+				};
+				jugadores.push(jugador);
+			}
+			
+			let obj = {"Jugadores":jugadores}; 
+			let jsonData = JSON.stringify(obj);
+			
+			var arrayReturn = [];
+			$.ajax({
+					type: 'POST',
+					url: 'http://localhost:10593/rd/Calculo_pago_jugadores.do',
+					data: jsonData,
+					contentType : "application/json",
+					dataType : "json",
+					success: function(data) {
+							
+							if( Object.entries(data).length === 0 || data.Jugadores===null || data.Jugadores==='' || data===null )
+							{
+								Swal.fire('Hubo un error en el procesamiento');
+								limpiar();
+							}
+							else
+							{
+								assignToEventsColumns(data.Jugadores);
+							}
+					}
+			});
+		}
+		
+	</script>
+</html>
+
+
+
+
+
+
+
+
+
+

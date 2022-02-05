@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-02-2022 a las 21:08:42
+-- Tiempo de generación: 05-02-2022 a las 03:15:09
 -- Versión del servidor: 10.4.13-MariaDB
 -- Versión de PHP: 7.2.31
 
@@ -46,10 +46,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `calculo_equipo_json` (IN `pParametr
 	DECLARE fbono VARCHAR(100);
 	DECLARE fcalculobonoindividual DECIMAL(12,2);
 	DECLARE fnombreequipo VARCHAR(100);
-    
-	#--DECLARE json_out2 JSON;
-	
-	
+    	
 	DECLARE json_out JSON;
 	DECLARE json_out2 JSON;
 	
@@ -61,7 +58,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `calculo_equipo_json` (IN `pParametr
     
     IF vJsonEsValido = 0 THEN 
         # El objeto JSON no es válido, salimos prematuramente
-        SELECT "JSON suministrado no es válido";
+        #--SELECT "JSON suministrado no es válido";
+		SELECT '[]' INTO pParametroJsonOut;
     ELSE 
 	
         # Nuestro objeto es válido, podemos proceder
@@ -75,31 +73,30 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `calculo_equipo_json` (IN `pParametr
                 SET vCampo1 = JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].id_jugador')));
                 SET vCampo2 = JSON_UNQUOTE(JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].goles')));
                 SET vCampo3 = JSON_EXTRACT(pParametroJson, CONCAT('$[', vIndex, '].sueldo_completo'));
+				SET fnombre=null;
 				
 				SELECT 	j.nombre,den.goles_mensuales,j.sueldo,j.bono,if( ( vCampo2 /den.goles_mensuales)*(j.bono/2) <= (j.bono/2) , ( vCampo2 /den.goles_mensuales)*(j.bono/2) , (j.bono/2) ),e.nombre INTO fnombre,fgolesmensuales,fsueldo,fbono,fcalculobonoindividual,fnombreequipo FROM Jugador j INNER JOIN detalle_equipo_nivel den ON den.id_den=j.id_den AND id_jugador=vCampo1 INNER JOIN equipo e ON den.id_equipo=e.id_equipo;
 				
 				SET fsueldo_completo=fsueldo+fcalculobonoindividual;
-                /*
-					Aqui se debe agregar los demas parametros de retorno obtenidos con querys
-					SELECT JSON_OBJECT( 'nombre',fnombre,'goles_minimos',fgolesmensuales,'goles',vCampo2,'sueldo',fsueldo,'bono',fbono,'sueldo_completo',fsueldo_completo,'calculo_individual',fcalculobonoindividual,'equipo', fnombreequipo ) INTO json_out;
-				*/
-				
+                				
 				SELECT JSON_OBJECT( 'nombre',fnombre,'goles_minimos',fgolesmensuales,'goles',vCampo2,'sueldo',fsueldo,'bono',fbono,'sueldo_completo',fsueldo_completo,'calculo_individual',fcalculobonoindividual,'equipo', fnombreequipo ) INTO json_out;
 								
 				SELECT JSON_INSERT(pParametroJsonOut, CONCAT('$[', vIndex, ']'),  json_out) INTO pParametroJsonOut;
 				
 				SET vIndex = vIndex + 1;
 				
+				#--Verificación de existencia de jugadores
+				IF fnombre IS NULL THEN
+					SET vIndex = vItems;
+					SET pParametroJsonOut='[]';
+				END IF;
+				
             END WHILE;
             
         END IF;
 		
 		SELECT REPLACE(REPLACE(REPLACE(JSON_EXTRACT(pParametroJsonOut, '$[*]'), '"{', "{"), '}"', "}"), "\\", "") INTO pParametroJsonOut;
-		
-		/*
-			JSON_ARRAY
-		*/
-		
+				
     END IF;
 END$$
 
