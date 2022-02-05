@@ -83,7 +83,7 @@ public class Utilerias {
         }
     }
     
-    public static Predicate<Calculo_sueldo_VO> filtroEquipo(String categoria) {
+    public Predicate<Calculo_sueldo_VO> filtroEquipo(String categoria) {
         return (Calculo_sueldo_VO l) -> {
           return l.getEquipo().equals(categoria);
         };
